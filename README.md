@@ -1,142 +1,154 @@
-# Prompt Optimizer Skill for Claude Code
+English | [中文](README_CN.md)
 
-基于 [prompt-optimizer](https://github.com/linshenkx/prompt-optimizer) 项目的 Claude Code Skill，提供 AI 提示词优化能力。
+# Prompt Optimizer
 
-## 功能特性
+A Claude Code skill that transforms your prompts into highly effective AI instructions.
 
-- **用户提示词优化**: 消除模糊表达，补充关键信息，提升表达清晰度
-- **系统提示词优化**: 按标准结构重组角色定义、技能和规则
-- **迭代优化**: 基于反馈改进现有提示词
+## Why Use This?
 
-## 安装
+**The Problem**: Vague prompts lead to vague responses. "Help me write a blog post" gets generic results.
 
-将此目录复制到 Claude Code 的 skills 目录：
+**The Solution**: Prompt Optimizer analyzes your prompt, identifies weaknesses, and transforms it into a precise, well-structured instruction that gets better AI responses.
+
+### Before & After
+
+| Before | After |
+|--------|-------|
+| "Help me write a blog post about AI" | A structured prompt with clear objectives, target audience, tone guidelines, and specific output format |
+| "Analyze this code" | A detailed prompt specifying analysis dimensions, expected findings format, and actionable recommendations |
+
+## Features
+
+- **Intelligent Optimization**: Automatically detects prompt complexity and applies the appropriate enhancement strategy
+- **Clear Evaluation**: Get a score (0-100) with specific feedback on what's strong and what can improve
+- **Iterative Refinement**: Keep improving your prompts with targeted instructions
+- **Copy-Ready Output**: Optimized prompts are formatted for immediate use
+
+## Installation
+
+### One-Line Install
+
+**macOS/Linux:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/geq1fan/prompt-optimizer-skill/main/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/geq1fan/prompt-optimizer-skill/main/install.ps1 | iex
+```
+
+### Manual Install
+
+```bash
+# Clone to Claude Code skills directory
+git clone https://github.com/geq1fan/prompt-optimizer-skill ~/.claude/skills/prompt-optimizer-skill
+```
+
+### Update
 
 ```bash
 # macOS/Linux
-cp -r prompt-optimizer-skill ~/.claude/skills/
+~/.claude/skills/prompt-optimizer-skill/install.sh update
 
 # Windows
-xcopy /E prompt-optimizer-skill %USERPROFILE%\.claude\skills\
+& "$env:USERPROFILE\.claude\skills\prompt-optimizer-skill\install.ps1" -Action update
 ```
 
-## 使用方法
+## Usage
 
-### 快速开始
-
-```bash
-# 优化用户提示词
-/optimize-prompt 帮我写一篇关于人工智能的文章
-
-# 优化系统提示词
-/optimize-prompt system 你是一个客服助手
-
-# 迭代优化现有提示词
-/optimize-prompt iterate
-```
-
-### 完整语法
+### Optimize a Prompt
 
 ```
-/optimize-prompt [type] [mode] [提示词内容]
+/optimize-prompt Write a function to parse JSON
 ```
 
-| 参数 | 可选值 | 默认值 | 说明 |
-|------|--------|--------|------|
-| type | user, system, iterate | user | 优化类型 |
-| mode | basic, professional, planning, general, analytical | basic/general | 优化模式 |
-
-### 优化模式详解
-
-**用户提示词模式：**
-
-| 模式 | 说明 | 适用场景 |
-|------|------|----------|
-| basic | 基础优化 | 日常对话、简单问答 |
-| professional | 专业优化 | 技术文档、专业需求 |
-| planning | 规划优化 | 复杂任务、项目规划 |
-
-**系统提示词模式：**
-
-| 模式 | 说明 | 适用场景 |
-|------|------|----------|
-| general | 通用优化 | 常规角色定义 |
-| analytical | 分析式优化 | 复杂业务场景 |
-
-## 示例
-
-### 用户提示词优化
-
-```bash
-# 基础优化（默认）
-/optimize-prompt 帮我分析这段代码
-
-# 专业优化
-/optimize-prompt user professional 帮我写一份技术方案，关于微服务架构设计
-
-# 规划优化
-/optimize-prompt user planning 开发一个电商网站的后台管理系统
-```
-
-### 系统提示词优化
-
-```bash
-# 通用优化（默认）
-/optimize-prompt system 你是一个编程助手
-
-# 分析式优化
-/optimize-prompt system analytical 你是一个代码审查专家，负责review团队的代码
-```
-
-### 迭代优化
-
-```bash
-/optimize-prompt iterate
-# 然后按提示输入：
-# 1. 现有提示词
-# 2. 优化需求
-```
-
-## 自定义模板
-
-模板文件位于 `templates/` 目录，可以直接修改：
+### Iterate on Results
 
 ```
-templates/
-├── cn/                     # 中文模板
-│   ├── user-optimize/
-│   │   ├── basic.md
-│   │   ├── professional.md
-│   │   └── planning.md
-│   ├── system-optimize/
-│   │   ├── general.md
-│   │   └── analytical.md
-│   └── iterate/
-│       └── general.md
-└── en/                     # 英文模板
-    └── ...
+/optimize-prompt iterate Add error handling requirements
 ```
 
-### 模板变量
+## Example
 
-| 变量 | 说明 |
-|------|------|
-| `{{originalPrompt}}` | 原始提示词 |
-| `{{lastOptimizedPrompt}}` | 待迭代的提示词 |
-| `{{iterateInput}}` | 优化需求描述 |
+**Input:**
+```
+/optimize-prompt Help me debug this React component
+```
 
-## 完整模板存档
+**Output:**
 
-`archived_templates/` 目录包含更多模板：
+### Optimized Prompt
+```
+Analyze the following React component to identify and resolve issues.
 
-- **图像优化**: text2image, image2image
-- **上下文优化**: 带上下文的高级优化
-- **评估模板**: 提示词质量评估
+**Context**: [Component code will be provided]
 
-## 致谢
+**Analysis Required**:
+1. Identify syntax errors and typos
+2. Check for React anti-patterns (e.g., missing keys, incorrect hook usage)
+3. Evaluate state management and prop handling
+4. Review performance implications
 
-本项目基于 [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer) 的模板系统。
+**Expected Output**:
+- List of identified issues with line numbers
+- Explanation of why each is problematic
+- Corrected code with comments explaining changes
+- Best practice recommendations for prevention
+```
 
-## 许可证
+### Evaluation Results
+
+**Overall Score: 88/100 (Good)**
+
+| Dimension | Score | Assessment |
+|-----------|-------|------------|
+| Clarity | 90/100 | Clear debugging objective |
+| Completeness | 85/100 | Good coverage, could specify component type |
+| Specificity | 90/100 | Concrete analysis steps |
+| Structure | 88/100 | Well-organized sections |
+
+**Want to improve further?**
+Try: `/optimize-prompt iterate Specify this is a form component with validation`
+
+## Use Cases
+
+| Scenario | How It Helps |
+|----------|--------------|
+| **Code Reviews** | Get structured, thorough review criteria |
+| **Documentation** | Clear requirements for comprehensive docs |
+| **Data Analysis** | Specific methodology and output format |
+| **Creative Writing** | Defined tone, audience, and structure |
+| **Problem Solving** | Step-by-step approach with constraints |
+
+## How It Works
+
+1. **Analysis**: Examines your prompt for clarity, completeness, and structure
+2. **Strategy Selection**: Chooses optimization approach based on complexity
+3. **Enhancement**: Applies targeted improvements while preserving intent
+4. **Evaluation**: Provides actionable feedback and scores
+
+## Templates
+
+The skill uses carefully crafted templates:
+
+| Template | Purpose |
+|----------|---------|
+| `optimize.md` | Main optimization with adaptive strategy |
+| `iterate/general.md` | Targeted refinement based on instructions |
+| `evaluation/user.md` | Comprehensive quality assessment |
+
+## Contributing
+
+Contributions welcome! Feel free to:
+- Report issues
+- Suggest improvements
+- Submit pull requests
+
+## License
 
 MIT License
+
+## Acknowledgments
+
+Inspired by [linshenkx/prompt-optimizer](https://github.com/linshenkx/prompt-optimizer).
