@@ -123,6 +123,8 @@ git clone https://github.com/geq1fan/prompt-optimizer-skill ~/.claude/skills/pro
 
 ## 工作原理
 
+![Prompt Optimizer Architecture](https://file.302.ai/gpt/imgs/20260114/a561176b971a4731835616b67e813f8c.png)
+
 1. **分析**：检查提示词的清晰度、完整性和结构
 2. **策略选择**：根据复杂度选择优化方案
 3. **增强**：在保持原意的同时进行针对性改进
