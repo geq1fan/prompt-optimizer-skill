@@ -123,6 +123,8 @@ Try: `/optimize-prompt iterate Specify this is a form component with validation`
 
 ## How It Works
 
+![Prompt Optimizer Architecture](https://file.302.ai/gpt/imgs/20260114/a561176b971a4731835616b67e813f8c.png)
+
 1. **Analysis**: Examines your prompt for clarity, completeness, and structure
 2. **Strategy Selection**: Chooses optimization approach based on complexity
 3. **Enhancement**: Applies targeted improvements while preserving intent
