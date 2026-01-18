@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "originalPrompt": "帮我写一个登录页面",
+  "current": {
+    "iterationId": "iter-001",
+    "optimizedPrompt": "# Role: 前端开发专家\n\n## Profile\n- Author: prompt-optimizer\n- Version: 1.0.0\n- Language: 中文\n- Description: 专业的登录页面开发专家\n\n## Background\n用户需要一个登录页面，包含用户名和密码输入框，以及登录按钮。\n\n## Goals\n1. 创建一个美观的登录页面\n2. 包含表单验证\n3. 支持记住密码功能\n\n## Constraints\n- 使用 HTML5 + CSS3\n- 响应式设计\n- 无障碍支持\n\n## OutputFormat\n输出完整的 HTML 文件，包含内联 CSS 和 JavaScript。",
+    "reviewReport": "### 📝 深度评审报告 (Critical Review)\n\n**1. 潜在的理解偏差**:\n- \"美观\" 未定义具体风格（扁平/拟物/毛玻璃）\n- \"表单验证\" 未明确是前端验证还是后端验证\n\n**2. 逻辑与边界盲区**:\n- 未说明登录失败的错误处理方式\n- 未定义密码强度要求\n\n**3. 健壮性结论**: \n需完善 - 核心逻辑清晰，但缺少错误处理指导",
+    "evaluationReport": "## 评估报告\n\n**总分**: 75 (Good)\n\n### 维度评分\n- **任务表达**: 80 - 目标明确\n- **信息完整性**: 70 - 缺少错误处理\n- **格式规范性**: 85 - 结构清晰\n- **改进程度**: 75 - 有明显提升\n\n### 核心优势\n- 结构化的角色定义\n- 明确的输出格式\n\n### 改进建议\n- 补充错误处理逻辑\n- 定义具体的 UI 风格",
+    "score": 75,
+    "suggestedDirections": [
+      {
+        "id": "error-handling",
+        "label": "错误处理",
+        "description": "补充登录失败、网络错误等异常情况的处理方式"
+      },
+      {
+        "id": "ui-style",
+        "label": "UI 风格",
+        "description": "明确具体的设计风格，如现代扁平、毛玻璃效果等"
+      },
+      {
+        "id": "security",
+        "label": "安全增强",
+        "description": "添加 CSRF 防护、密码加密等安全措施"
+      }
+    ]
+  },
+  "history": []
+}

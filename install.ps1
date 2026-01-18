@@ -29,7 +29,9 @@ $ErrorActionPreference = "Stop"
 
 $SkillName = "prompt-optimizer-skill"
 $ClaudeSkillsDir = Join-Path $env:USERPROFILE ".claude\skills"
-$RepoUrl = "https://github.com/geq1fan/prompt-optimizer-skill"
+$Repo = "geq1fan/prompt-optimizer-skill"
+$GitHubApi = "https://api.github.com/repos/$Repo/releases/latest"
+$GitHubReleases = "https://github.com/$Repo/releases/download"
 
 function Write-Step {
     param([string]$Message)
@@ -49,40 +51,51 @@ function Write-Error {
     Write-Host $Message
 }
 
-function Test-GitInstalled {
+function Get-LatestVersion {
+    Write-Step "Fetching latest version..."
+
     try {
-        $null = git --version
-        return $true
+        $response = Invoke-RestMethod -Uri $GitHubApi -UseBasicParsing
+        $script:Version = $response.tag_name
+        Write-Host "Latest version: $script:Version"
     }
     catch {
-        return $false
+        Write-Error "Failed to get latest version. Check your network connection."
+        exit 1
     }
+}
+
+function Get-PackageName {
+    $script:PackageName = "prompt-optimizer-skill-windows-amd64.zip"
+}
+
+function Download-Package {
+    $url = "$GitHubReleases/$script:Version/$script:PackageName"
+    $tempDir = Join-Path $env:TEMP "prompt-optimizer-install-$(Get-Date -Format 'yyyyMMddHHmmss')"
+    New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+    $packagePath = Join-Path $tempDir $script:PackageName
+
+    Write-Step "Downloading $script:PackageName..."
+
+    try {
+        Invoke-WebRequest -Uri $url -OutFile $packagePath -UseBasicParsing
+    }
+    catch {
+        Write-Error "Download failed: $_"
+        exit 1
+    }
+
+    Write-Step "Extracting..."
+
+    Expand-Archive -Path $packagePath -DestinationPath $tempDir -Force
+
+    $script:TempSkillsDir = Join-Path $tempDir "skills"
 }
 
 function Ensure-SkillsDirectory {
     if (-not (Test-Path $ClaudeSkillsDir)) {
         Write-Step "Creating skills directory..."
         New-Item -ItemType Directory -Path $ClaudeSkillsDir -Force | Out-Null
-    }
-}
-
-function Remove-InstallationFiles {
-    param([string]$TargetDir)
-
-    $filesToRemove = @(
-        ".git",
-        "install.sh",
-        "install.ps1",
-        "task_plan.md",
-        "findings.md",
-        "progress.md"
-    )
-
-    foreach ($file in $filesToRemove) {
-        $path = Join-Path $TargetDir $file
-        if (Test-Path $path) {
-            Remove-Item -Path $path -Recurse -Force
-        }
     }
 }
 
@@ -95,14 +108,15 @@ function Install-Skill {
         exit 1
     }
 
-    Write-Step "Installing $SkillName..."
-    git clone $RepoUrl $TargetDir
+    Get-PackageName
+    Get-LatestVersion
+    Download-Package
 
-    Write-Step "Cleaning up..."
-    Remove-InstallationFiles -TargetDir $TargetDir
+    Write-Step "Installing $SkillName..."
+    Move-Item -Path $script:TempSkillsDir -Destination $TargetDir
 
     Write-Host ""
-    Write-Step "Installation complete!"
+    Write-Step "Installation complete! (version: $script:Version)"
     Write-Host ""
     Write-Host "Usage:"
     Write-Host "  /optimize-prompt <your prompt>"
@@ -119,27 +133,20 @@ function Update-Skill {
         exit 1
     }
 
+    Get-PackageName
+    Get-LatestVersion
+    Download-Package
+
     Write-Step "Updating $SkillName..."
 
-    # Create temp directory
-    $TempDir = Join-Path $env:TEMP "prompt-optimizer-update-$(Get-Date -Format 'yyyyMMddHHmmss')"
-
-    # Clone to temp directory
-    git clone $RepoUrl $TempDir
-
-    # Backup existing installation
-    $BackupDir = "$TargetDir.backup.$(Get-Date -Format 'yyyyMMddHHmmss')"
-    Move-Item -Path $TargetDir -Destination $BackupDir
+    # Remove existing installation
+    Remove-Item -Path $TargetDir -Recurse -Force
 
     # Move new version
-    Move-Item -Path $TempDir -Destination $TargetDir
-
-    # Cleanup
-    Remove-InstallationFiles -TargetDir $TargetDir
+    Move-Item -Path $script:TempSkillsDir -Destination $TargetDir
 
     Write-Host ""
-    Write-Step "Update complete!"
-    Write-Host "Backup saved to: $BackupDir"
+    Write-Step "Update complete! (version: $script:Version)"
     Write-Host ""
     Write-Host "Restart Claude Code to load the updated skill."
 }
@@ -172,11 +179,6 @@ function Show-Help {
 }
 
 # Main
-if (-not (Test-GitInstalled)) {
-    Write-Error "git is not installed. Please install git first."
-    exit 1
-}
-
 switch ($Action) {
     "install" {
         Ensure-SkillsDirectory

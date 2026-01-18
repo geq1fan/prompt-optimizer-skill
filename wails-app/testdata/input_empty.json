@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "originalPrompt": "",
+  "current": {
+    "iterationId": "iter-001",
+    "optimizedPrompt": "",
+    "reviewReport": "",
+    "evaluationReport": "",
+    "score": 0,
+    "suggestedDirections": []
+  },
+  "history": []
+}

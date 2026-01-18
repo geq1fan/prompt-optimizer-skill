@@ -1,0 +1,52 @@
+{
+  "version": 3,
+  "originalPrompt": "你是一个AI助手，帮助用户解答问题。",
+  "current": {
+    "iterationId": "iter-003",
+    "optimizedPrompt": "# Role: 专业AI助手\n\n## Profile\n- Author: Prompt Optimizer\n- Version: 3.0\n- Language: 中文\n\n## Background\n你是一个专业的AI助手，具备以下特点：\n- 深厚的知识储备\n- 清晰的逻辑思维\n- 友好的沟通方式\n\n## Skills\n1. 问题分析与解答\n2. 信息整理与总结\n3. 多领域知识应用\n\n## Rules\n- 回答要准确、专业\n- 语言要清晰、易懂\n- 必要时提供示例\n\n## Workflow\n1. 理解用户问题\n2. 分析问题背景\n3. 提供专业解答\n4. 确认用户满意",
+    "reviewReport": "## 评审报告\n\n### 优点\n- 结构清晰，采用了标准的 Role-Profile 模板\n- 明确定义了角色的技能和规则\n- 工作流程设计合理\n\n### 改进建议\n- 可以增加更多具体示例\n- 可以细化约束条件\n- 可以添加异常处理规则",
+    "evaluationReport": "## 评估报告\n\n### 评分明细\n| 维度 | 得分 | 说明 |\n|------|------|------|\n| 结构完整性 | 90 | 模板完整 |\n| 语义清晰度 | 85 | 表达清楚 |\n| 约束明确性 | 80 | 可进一步细化 |\n| 可执行性 | 85 | 易于理解执行 |\n\n### 综合评分: 85/100",
+    "score": 85,
+    "suggestedDirections": [
+      {
+        "id": "examples",
+        "label": "添加示例",
+        "description": "在 Prompt 中加入具体的输入输出示例，帮助模型更好地理解预期行为"
+      },
+      {
+        "id": "constraints",
+        "label": "增强约束",
+        "description": "添加更明确的边界条件和限制，减少模型产生不期望输出的可能性"
+      },
+      {
+        "id": "structure",
+        "label": "优化结构",
+        "description": "调整段落组织和层次结构，使逻辑更清晰"
+      }
+    ]
+  },
+  "history": [
+    {
+      "iterationId": "iter-002",
+      "optimizedPrompt": "# Role: AI助手\n\n## 简介\n你是一个专业的AI助手。\n\n## 能力\n- 解答问题\n- 提供建议\n\n## 规则\n- 回答要准确\n- 语言要清晰",
+      "reviewReport": "## 评审报告\n\n结构有所改进，但仍需完善。",
+      "evaluationReport": "## 评估报告\n\n综合评分: 75/100",
+      "score": 75,
+      "userFeedback": {
+        "selectedDirections": ["structure", "constraints"],
+        "userInput": "希望结构更完整，添加工作流程"
+      }
+    },
+    {
+      "iterationId": "iter-001",
+      "optimizedPrompt": "你是一个专业的AI助手，能够帮助用户解答各种问题。请以专业、友好的方式回答。",
+      "reviewReport": "## 评审报告\n\n初始优化，结构较简单。",
+      "evaluationReport": "## 评估报告\n\n综合评分: 65/100",
+      "score": 65,
+      "userFeedback": {
+        "selectedDirections": ["structure"],
+        "userInput": "需要更清晰的结构"
+      }
+    }
+  ]
+}

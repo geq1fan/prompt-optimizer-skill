@@ -1,0 +1,13 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "prompt-optimizer-webview",
+  "outputfilename": "prompt-optimizer-webview",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "",
+  "frontend:dev:serverUrl": "",
+  "author": {
+    "name": "Prompt Optimizer Team",
+    "email": ""
+  }
+}

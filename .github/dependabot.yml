@@ -1,0 +1,43 @@
+version: 2
+updates:
+  # Go 依赖
+  - package-ecosystem: "gomod"
+    directory: "/wails-app"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "go"
+
+  # npm 依赖
+  - package-ecosystem: "npm"
+    directory: "/wails-app/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "npm"
+    # 仅更新开发依赖，生产依赖手动控制
+    allow:
+      - dependency-type: "development"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "dependencies"
+      - "github-actions"

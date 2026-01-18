@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Optimizer</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <!-- Loading 骨架屏 -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="skeleton-container">
+      <div class="skeleton-header">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-countdown"></div>
+      </div>
+      <div class="skeleton-toolbar">
+        <div class="skeleton skeleton-button"></div>
+        <div class="skeleton skeleton-button"></div>
+        <div class="skeleton skeleton-button"></div>
+      </div>
+      <div class="skeleton-content">
+        <div class="skeleton-left">
+          <div class="skeleton skeleton-score-ring"></div>
+        </div>
+        <div class="skeleton-right">
+          <div class="skeleton skeleton-text-line full"></div>
+          <div class="skeleton skeleton-text-line medium"></div>
+          <div class="skeleton skeleton-text-line full"></div>
+          <div class="skeleton skeleton-text-line short"></div>
+        </div>
+      </div>
+      <div class="skeleton-prompt">
+        <div class="skeleton skeleton-text-line full"></div>
+        <div class="skeleton skeleton-text-line full"></div>
+        <div class="skeleton skeleton-text-line medium"></div>
+      </div>
+      <div class="skeleton-cards">
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主内容 -->
+  <div id="main-content" class="main-content noise-overlay hidden">
+    <!-- 窗口头部 -->
+    <header class="window-header" data-wails-drag>
+      <div class="header-left">
+        <div class="traffic-lights">
+          <button class="traffic-light close" onclick="handleCancel()"></button>
+          <button class="traffic-light minimize"></button>
+          <button class="traffic-light maximize"></button>
+        </div>
+        <h1 class="window-title">Prompt Optimizer</h1>
+      </div>
+      <div class="header-right">
+        <span id="countdown" class="countdown">10:00</span>
+      </div>
+    </header>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button class="toolbar-btn active" id="current-version-btn">
+          <span>当前版本</span>
+          <span id="version-badge" class="version-badge">v1</span>
+        </button>
+        <div class="history-dropdown-wrapper">
+          <button class="toolbar-btn" id="history-btn" onclick="toggleHistoryDropdown()">
+            <span>历史记录</span>
+            <svg class="icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div id="history-dropdown" class="history-dropdown hidden"></div>
+        </div>
+        <button class="toolbar-btn" id="compare-btn" onclick="showCompareView()">
+          <span>版本对比</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <main class="content-area">
+      <!-- 评分区 + 报告区 -->
+      <div class="score-report-section">
+        <!-- 评分环形图 -->
+        <div class="score-section">
+          <div class="score-ring-container">
+            <svg class="score-ring" viewBox="0 0 160 160">
+              <circle class="score-ring-bg" cx="80" cy="80" r="70" fill="none" stroke-width="10"/>
+              <circle id="score-ring-progress" class="score-ring-progress" cx="80" cy="80" r="70" fill="none" stroke-width="10" stroke-linecap="round"/>
+            </svg>
+            <div class="score-text">
+              <span id="score-value" class="score-value">0</span>
+              <span class="score-max">/100</span>
+            </div>
+          </div>
+          <div id="score-grade" class="score-grade">-</div>
+        </div>
+
+        <!-- 报告区 (Tab) -->
+        <div class="report-section">
+          <div class="segmented-control">
+            <button class="segment active" data-tab="review" onclick="switchTab('review')">评审报告</button>
+            <button class="segment" data-tab="evaluation" onclick="switchTab('evaluation')">评估报告</button>
+            <div class="segment-indicator"></div>
+          </div>
+          <div class="report-content">
+            <div id="review-report" class="report-panel active"></div>
+            <div id="evaluation-report" class="report-panel hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 优化后的提示词 -->
+      <div class="prompt-section">
+        <div class="prompt-header">
+          <h3>优化后的提示词</h3>
+          <button class="copy-btn" onclick="copyPrompt()" title="复制">
+            <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M3 11V3C3 2.44772 3.44772 2 4 2H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="copy-text">复制</span>
+          </button>
+        </div>
+        <div id="optimized-prompt" class="prompt-content"></div>
+      </div>
+
+      <!-- 评分进度条 + 原始 Prompt -->
+      <div class="meta-section">
+        <div class="score-bar-container">
+          <span class="score-bar-label">评分:</span>
+          <div class="score-bar">
+            <div id="score-bar-fill" class="score-bar-fill"></div>
+          </div>
+          <span id="score-bar-value" class="score-bar-value">0/100</span>
+        </div>
+        <button class="original-prompt-btn" onclick="showOriginalPrompt()">
+          <span>原始 Prompt:</span>
+          <span class="link-text">查看原始输入</span>
+        </button>
+      </div>
+
+      <!-- 优化方向选择 -->
+      <div class="directions-section">
+        <h3 class="section-title">优化方向选择</h3>
+        <div id="direction-cards" class="direction-cards"></div>
+      </div>
+
+      <!-- 补充说明输入 -->
+      <div class="input-section">
+        <div class="input-header">
+          <label for="user-input">补充说明 (可选)</label>
+          <span id="char-count" class="char-count">0 / 2000</span>
+        </div>
+        <textarea id="user-input" class="user-input" placeholder="请输入您的补充说明，帮助 AI 更好地理解您的需求..." maxlength="2000"></textarea>
+      </div>
+    </main>
+
+    <!-- 底部按钮 -->
+    <footer class="footer">
+      <button class="btn btn-secondary" onclick="handleCancel()">取消</button>
+      <button id="submit-btn" class="btn btn-primary" onclick="handleSubmit()">确定</button>
+    </footer>
+  </div>
+
+  <!-- 版本对比视图 -->
+  <div id="compare-view" class="compare-view hidden">
+    <header class="compare-header">
+      <h2>版本对比</h2>
+      <button class="back-btn" onclick="hideCompareView()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>返回</span>
+      </button>
+    </header>
+    <div class="compare-selector">
+      <select id="compare-left" class="compare-select" onchange="updateComparison()"></select>
+      <span class="compare-arrow">↔</span>
+      <select id="compare-right" class="compare-select" onchange="updateComparison()"></select>
+    </div>
+    <div class="compare-panels">
+      <div class="compare-panel">
+        <div id="compare-left-header" class="compare-panel-header">v1 (0分)</div>
+        <div id="compare-left-content" class="compare-panel-content"></div>
+      </div>
+      <div class="compare-panel">
+        <div id="compare-right-header" class="compare-panel-header">v2 (0分)</div>
+        <div id="compare-right-content" class="compare-panel-content"></div>
+      </div>
+    </div>
+    <div class="compare-footer">
+      <button id="rollback-from-compare-btn" class="btn btn-primary" onclick="rollbackFromCompare()">
+        基于左侧版本继续优化
+      </button>
+    </div>
+  </div>
+
+  <!-- 原始 Prompt 弹窗 -->
+  <div id="original-prompt-modal" class="modal hidden">
+    <div class="modal-backdrop" onclick="hideOriginalPrompt()"></div>
+    <div class="modal-content original-prompt-modal">
+      <div class="modal-header">
+        <h3>原始 Prompt</h3>
+        <button class="modal-close" onclick="hideOriginalPrompt()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div id="original-prompt-content" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- 成功动画 -->
+  <div id="success-overlay" class="success-overlay hidden">
+    <svg class="success-checkmark" viewBox="0 0 52 52">
+      <circle class="checkmark-circle" cx="26" cy="26" r="25"/>
+      <path class="checkmark-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+    </svg>
+  </div>
+
+  <script src="src/main.js"></script>
+</body>
+</html>

@@ -1,1 +1,50 @@
 .ace-tool/
+.ccb_config/
+.claude/settings.local.json
+
+# ========== WebUI Dev Build ==========
+webui/bin/
+
+# ========== Skills Binary ==========
+skills/bin/*
+!skills/bin/.gitkeep
+
+# ========== Wails App ==========
+# Build output
+wails-app/build/
+wails-app/frontend/dist/
+
+# Go
+wails-app/*.exe
+wails-app/*.exe~
+wails-app/*.dll
+wails-app/*.so
+wails-app/*.dylib
+
+# Go test
+wails-app/coverage.out
+wails-app/coverage.html
+wails-app/*.test
+
+# ========== Frontend ==========
+# Dependencies
+wails-app/frontend/node_modules/
+
+# Test coverage
+wails-app/frontend/coverage/
+
+# ========== IDE ==========
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ========== OS ==========
+.DS_Store
+Thumbs.db
+
+# ========== Temp files ==========
+*.tmp
+*.temp
+*.log

@@ -1,0 +1,47 @@
+{
+  "version": 3,
+  "originalPrompt": "写一个 API 接口",
+  "current": {
+    "iterationId": "iter-003",
+    "optimizedPrompt": "# Role: RESTful API 架构师\n\n## Profile\n- Author: prompt-optimizer\n- Version: 3.0.0\n- Language: 中文\n- Description: 专业的 RESTful API 设计与实现专家\n\n## Background\n用户需要设计一个用户管理 API，支持 CRUD 操作。\n\n## Goals\n1. 设计符合 RESTful 规范的 API 端点\n2. 实现完整的错误处理机制\n3. 添加请求验证和响应格式化\n4. 编写 API 文档\n\n## Constraints\n- 使用 Node.js + Express\n- 遵循 OpenAPI 3.0 规范\n- 响应时间 < 200ms\n- 支持分页和过滤\n\n## Workflow\n1. 定义数据模型\n2. 设计路由结构\n3. 实现控制器逻辑\n4. 添加中间件\n5. 编写测试用例\n\n## OutputFormat\n```json\n{\n  \"endpoint\": \"/api/v1/users\",\n  \"method\": \"GET|POST|PUT|DELETE\",\n  \"request\": { ... },\n  \"response\": { ... }\n}\n```",
+    "reviewReport": "### 📝 深度评审报告 (Critical Review)\n\n**1. 潜在的理解偏差**:\n- 无明显歧义\n\n**2. 逻辑与边界盲区**:\n- 未说明认证机制（JWT/OAuth）\n- 未定义速率限制策略\n\n**3. 健壮性结论**: \n健壮 - 逻辑严密，建议补充认证相关说明",
+    "evaluationReport": "## 评估报告\n\n**总分**: 88 (Excellent)\n\n### 维度评分\n- **任务表达**: 92 - 目标清晰具体\n- **信息完整性**: 85 - 基本完整\n- **格式规范性**: 90 - 结构优秀\n- **改进程度**: 88 - 显著提升\n\n### 核心优势\n- 完整的 Workflow 定义\n- 明确的 OutputFormat\n- 具体的性能约束\n\n### 改进建议\n- 补充认证机制说明\n- 添加速率限制策略",
+    "score": 88,
+    "suggestedDirections": [
+      {
+        "id": "auth",
+        "label": "认证机制",
+        "description": "添加 JWT 或 OAuth2.0 认证流程说明"
+      },
+      {
+        "id": "rate-limit",
+        "label": "速率限制",
+        "description": "定义 API 调用频率限制策略"
+      }
+    ]
+  },
+  "history": [
+    {
+      "iterationId": "iter-001",
+      "optimizedPrompt": "# Role: API 开发者\n\n请帮我写一个用户管理 API。",
+      "reviewReport": "### 评审报告\n\n需要更多细节",
+      "evaluationReport": "**总分**: 55 (Fair)\n\n缺少具体要求",
+      "score": 55,
+      "userFeedback": {
+        "selectedDirections": ["structure"],
+        "userInput": "需要更详细的结构"
+      }
+    },
+    {
+      "iterationId": "iter-002",
+      "optimizedPrompt": "# Role: API 开发专家\n\n## Goals\n1. 设计 RESTful API\n2. 实现 CRUD 操作\n\n## Constraints\n- 使用 Node.js",
+      "reviewReport": "### 评审报告\n\n结构有改进，但缺少输出格式",
+      "evaluationReport": "**总分**: 72 (Good)\n\n有进步，继续完善",
+      "score": 72,
+      "userFeedback": {
+        "selectedDirections": ["examples", "constraints"],
+        "userInput": "添加输出格式示例和更多约束"
+      }
+    }
+  ]
+}

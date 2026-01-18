@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "originalPrompt": "中文测试 🎉 日本語 한국어 العربية",
+  "current": {
+    "iterationId": "iter-001",
+    "optimizedPrompt": "# Role: 多语言支持专家 🌍\n\n## Profile\n- Author: prompt-optimizer\n- Version: 1.0.0\n- Language: 多语言 (中文/English/日本語/한국어)\n- Description: 支持多种语言的国际化专家\n\n## Background\n用户需要多语言支持的应用程序。\n\n## 特殊字符测试\n- 中文引号：「这是中文引号」\n- 日文假名：ひらがな カタカナ\n- 韩文：안녕하세요\n- 阿拉伯文：مرحبا\n- 表情符号：🚀 ✨ 🎯 💡 ⚡\n- 数学符号：∑ ∏ √ ∞ ≠ ≤ ≥\n- 特殊符号：© ® ™ § ¶ † ‡\n\n## Goals\n1. 支持 UTF-8 编码\n2. 处理 RTL 语言\n3. 正确渲染 Emoji\n\n## OutputFormat\n```json\n{\n  \"locale\": \"zh-CN\",\n  \"message\": \"你好，世界！\",\n  \"emoji\": \"👋\"\n}\n```",
+    "reviewReport": "### 📝 深度评审报告 (Critical Review)\n\n**1. 潜在的理解偏差**:\n- 无明显歧义\n\n**2. 逻辑与边界盲区**:\n- 未说明字体回退策略\n\n**3. 健壮性结论**: \n健壮 - 多语言支持完整",
+    "evaluationReport": "## 评估报告\n\n**总分**: 85 (Excellent)\n\n### 维度评分\n- **任务表达**: 85 - 目标明确\n- **信息完整性**: 85 - 多语言覆盖全面\n- **格式规范性**: 85 - 格式正确\n- **改进程度**: 85 - 良好\n\n### 核心优势\n- 多语言字符支持\n- Emoji 正确处理\n\n### 改进建议\n- 添加字体回退说明",
+    "score": 85,
+    "suggestedDirections": [
+      {
+        "id": "font-fallback",
+        "label": "字体回退",
+        "description": "添加不同语言的字体回退策略"
+      },
+      {
+        "id": "rtl-support",
+        "label": "RTL 支持",
+        "description": "增强从右到左语言的布局支持"
+      }
+    ]
+  },
+  "history": []
+}

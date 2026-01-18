@@ -1,0 +1,69 @@
+{
+  "version": 5,
+  "originalPrompt": "帮我优化代码性能",
+  "current": {
+    "iterationId": "iter-005",
+    "optimizedPrompt": "# Role: 性能优化专家 🚀\n\n## Profile\n- Author: prompt-optimizer\n- Version: 5.0.0\n- Language: 中文/English\n- Description: 代码性能分析与优化专家\n\n## Background\n用户需要对现有代码进行性能优化，目标是减少 50% 的执行时间。\n\n## Context\n项目使用 Python 3.11，主要瓶颈在数据处理模块。\n涉及的关键函数包括：\n- `process_data()` - 数据预处理\n- `analyze()` - 数据分析\n- `export_results()` - 结果导出\n\n## Goals\n1. 识别性能瓶颈\n2. 提供优化方案\n3. 评估优化效果\n\n## Constraints\n- 不改变 API 接口\n- 保持代码可读性\n- 兼容 Python 3.9+\n\n## Workflow\n1. 使用 cProfile 进行性能分析\n2. 识别热点函数\n3. 应用优化策略：\n   - 算法优化\n   - 缓存策略\n   - 并行处理\n4. 基准测试验证\n\n## OutputFormat\n```markdown\n## 性能分析报告\n\n### 瓶颈识别\n| 函数 | 调用次数 | 总耗时 | 优化建议 |\n|------|---------|--------|----------|\n\n### 优化方案\n1. [方案描述]\n   - 预期提升: XX%\n   - 实现难度: 低/中/高\n\n### 优化后代码\n```python\n# 优化后的代码\n```\n```",
+    "reviewReport": "### 📝 深度评审报告 (Critical Review)\n\n**1. 潜在的理解偏差**:\n- \"减少 50% 执行时间\" 目标可能过于激进\n\n**2. 逻辑与边界盲区**:\n- 未考虑内存优化\n- 未说明多线程安全要求\n\n**3. 健壮性结论**: \n健壮 - 整体逻辑严密，工作流程完整",
+    "evaluationReport": "## 评估报告\n\n**总分**: 92 (Excellent)\n\n### 维度评分\n- **任务表达**: 95 - 非常清晰\n- **信息完整性**: 90 - 上下文完整\n- **格式规范性**: 95 - 格式规范\n- **改进程度**: 90 - 持续优化\n\n### 核心优势\n- 完整的 Context 注入\n- 详细的 Workflow\n- 规范的 OutputFormat\n\n### 改进建议\n- 可考虑添加内存优化维度",
+    "score": 92,
+    "suggestedDirections": [
+      {
+        "id": "memory",
+        "label": "内存优化",
+        "description": "添加内存使用分析和优化建议"
+      },
+      {
+        "id": "parallel",
+        "label": "并行策略",
+        "description": "详细说明多线程/多进程策略"
+      }
+    ]
+  },
+  "history": [
+    {
+      "iterationId": "iter-001",
+      "optimizedPrompt": "帮我优化代码",
+      "reviewReport": "需要更多细节",
+      "evaluationReport": "**总分**: 40",
+      "score": 40,
+      "userFeedback": {
+        "selectedDirections": ["structure"],
+        "userInput": "太简单了"
+      }
+    },
+    {
+      "iterationId": "iter-002",
+      "optimizedPrompt": "# Role: 优化专家\n\n优化 Python 代码性能",
+      "reviewReport": "有角色定义，但缺少具体目标",
+      "evaluationReport": "**总分**: 55",
+      "score": 55,
+      "userFeedback": {
+        "selectedDirections": ["examples", "constraints"],
+        "userInput": "需要具体的优化目标"
+      }
+    },
+    {
+      "iterationId": "iter-003",
+      "optimizedPrompt": "# Role: 性能优化专家\n\n## Goals\n1. 分析性能瓶颈\n2. 提供优化建议\n\n## Constraints\n- Python 3.9+",
+      "reviewReport": "结构改进，但缺少输出格式",
+      "evaluationReport": "**总分**: 70",
+      "score": 70,
+      "userFeedback": {
+        "selectedDirections": ["format"],
+        "userInput": "需要输出格式"
+      }
+    },
+    {
+      "iterationId": "iter-004",
+      "optimizedPrompt": "# Role: 性能优化专家\n\n## Goals\n1. 识别性能瓶颈\n2. 提供优化方案\n\n## Workflow\n1. 性能分析\n2. 优化实施\n\n## OutputFormat\n性能报告表格",
+      "reviewReport": "已有完整结构",
+      "evaluationReport": "**总分**: 82",
+      "score": 82,
+      "userFeedback": {
+        "selectedDirections": ["context"],
+        "userInput": "添加项目具体上下文"
+      }
+    }
+  ]
+}

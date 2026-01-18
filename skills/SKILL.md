@@ -98,6 +98,49 @@ description: 专业用户提示词优化工具，执行「优化 → 对抗测�
 3. **评估报告** — 包含分数、维度评价和改进建议
 4. **当前模式** — 在报告中注明使用的优化模式
 
+### 7. 交互式确认 (可选)
+
+当需要用户确认优化结果时，可调用 WebView 桌面应用进行交互：
+
+```bash
+# 调用 WebView 应用
+webui/bin/prompt-optimizer-webview --input <input.json> --output <result.json> --timeout 600
+```
+
+**输入文件格式 (input.json)**:
+```json
+{
+  "version": 3,
+  "originalPrompt": "原始提示词",
+  "current": {
+    "iterationId": "iter-003",
+    "optimizedPrompt": "优化后的提示词 (Markdown)",
+    "reviewReport": "评审报告 (Markdown)",
+    "evaluationReport": "评估报告 (Markdown)",
+    "score": 85,
+    "suggestedDirections": [
+      {"id": "examples", "label": "添加示例", "description": "补充使用案例"}
+    ]
+  },
+  "history": []
+}
+```
+
+**输出结果格式 (result.json)**:
+```json
+// 用户确认
+{"action": "submit", "selectedDirections": ["examples"], "userInput": "补充说明"}
+
+// 用户取消
+{"action": "cancel", "selectedDirections": [], "userInput": ""}
+
+// 超时
+{"action": "timeout", "selectedDirections": [], "userInput": ""}
+
+// 回滚到历史版本
+{"action": "rollback", "rollbackToIteration": "iter-001", "selectedDirections": [], "userInput": ""}
+```
+
 ## 错误处理
 
 | 情况 | 处理方式 |

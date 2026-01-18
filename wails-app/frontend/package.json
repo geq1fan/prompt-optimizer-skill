@@ -1,0 +1,16 @@
+{
+  "name": "prompt-optimizer-frontend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "dev:port": "node dev-server.js --port",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "vitest": "^1.2.0",
+    "@vitest/coverage-v8": "^1.2.0"
+  }
+}
