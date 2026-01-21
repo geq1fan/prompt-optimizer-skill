@@ -8,6 +8,10 @@ export function GetInputData():Promise<main.InputData>;
 
 export function GetRemainingSeconds():Promise<number>;
 
+export function GetSessionData():Promise<main.SessionData>;
+
+export function GetTimeoutSeconds():Promise<number>;
+
 export function Rollback(arg1:string,arg2:Array<string>,arg3:string):Promise<void>;
 
 export function Submit(arg1:Array<string>,arg2:string):Promise<void>;

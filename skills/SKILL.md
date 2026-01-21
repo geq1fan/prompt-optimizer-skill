@@ -1,154 +1,120 @@
 ---
-name: optimize-prompt
-description: 专业用户提示词优化工具，执行「优化 → 对抗测试 → 评估」工作流。
+name: prompt-optimizer
+description: |
+  专业用户提示词优化工具，执行「优化 → 对抗测试 → 评估」工作流。
+  触发条件：(1) 用户输入 `/optimize-prompt [内容]` 或 `-enhancer` 标记；(2) 用户请求优化、改进、增强提示词。
+  每次调用创建新 Session，迭代只能通过 WebView 交互触发。
 ---
 
 # 提示词优化器
 
-## 激活条件
+## 命令格式
 
-用户只需输入 `/optimize-prompt [内容]`，系统会自动判断是**新任务**还是**迭代指令**。
+```
+/optimize-prompt [内容]
+```
 
-- `/optimize-prompt [内容]` — 智能识别意图（推荐）
-  - 如果内容是"更短一点"、"添加示例"等指令 → 自动进入 **Iterate 模式**
-  - 如果内容是"写个周报"、"分析代码"等新话题 → 自动进入 **User 模式** (Basic/Pro/Plan)
-- `/optimize-prompt iterate [指令]` — 强制进入迭代模式
-- `/optimize-prompt user [模式] [内容]` — 强制进入新任务模式
+每次调用 `/optimize-prompt` 都会创建一个新的 Session，开始一轮完整的优化流程。
 
-## 快速参考
+**迭代方式**：通过 WebView 交互（submit/rollback）触发，无需再次输入命令。
 
-| 类型 | 可用模式 | 模板路径 |
-|-----|---------|---------|
-| user | basic, professional, planning | `templates/{lang}/user-optimize/{mode}.md` |
+## 模板参考
+
+| 类型 | 模式 | 路径 |
+|-----|------|-----|
+| user | basic / professional / planning | `templates/{lang}/user-optimize/{mode}.md` |
 | iterate | general | `templates/{lang}/iterate/general.md` |
-| review | default | `templates/{lang}/evaluation/critical-review.md` |
+| review | critical-review | `templates/{lang}/evaluation/critical-review.md` |
+| evaluation | user | `templates/{lang}/evaluation/user.md` |
 
-**语言检测**: 中文输入使用 `cn`，英文输入使用 `en`。
+**语言检测**：中文输入 → `cn/`；其他 → `en/`
 
-## 执行步骤
+## 执行流程
 
-### 1. 意图识别与路由 (Dispatcher)
+### 1. Session 创建
 
-系统首先分析用户的输入内容和当前的对话上下文：
+每次 `/optimize-prompt` 调用都会创建新 Session：
+- 生成 `session_id`：`session_{timestamp}`（毫秒时间戳）
+- 创建目录：`~/.prompt-optimizer/sessions/{session_id}/`
+- 创建 `session.json`（v4 格式，唯一数据源）
 
-**优先级判定逻辑**：
-1. **显式指定**: 若用户输入了 `iterate` 或 `user` 关键字，直接进入对应模式。
-2. **冷启动**: 若当前对话历史中**不存在** `lastOptimizedPrompt`，默认为 **User 模式**。
-3. **语义分析**: 若存在历史记录，分析输入内容与上文的关系：
-   - **Iterate 模式 (迭代)**: 输入是对上文的修改、补充、反馈。
-     - *特征词*: "更..."、"有点..."、"添加..."、"删除..."、"修改..."、"不..."、"太..."。
-   - **User 模式 (新任务)**: 输入是一个全新的、独立的话题。
-     - *特征*: 完整的任务描述，与上文无明显指代关系。
+### 2. 模式选择
 
-### 2. 模式执行
+根据任务内容选择优化模板：
 
-#### A. User 模式 (新任务)
-若判定为新任务，进一步分析内容特征以选择模板：
+| 特征 | 模式 | 模板 |
+|-----|------|-----|
+| 涉及步骤、计划、流程、roadmap | planning | `user-optimize/planning.md` |
+| 涉及代码、分析、学术、技术文档 | professional | `user-optimize/professional.md` |
+| 其他通用场景 | basic | `user-optimize/basic.md` |
 
-1. **Planning (规划模式)**: 涉及步骤、计划、流程、roadmap。
-2. **Professional (专业模式)**: 涉及代码、分析、学术、专业输出。
-3. **Basic (基础模式)**: 其他通用场景。
+### 3. 上下文采集
 
-#### B. Iterate 模式 (迭代)
-若判定为迭代指令：
-
-1. **自动检索上下文**: 
-   - 获取 `lastOptimizedPrompt` (上次结果) 和 `lastEvaluationReport` (上次报告)。
-2. **提取改进指令**: 
-   - 将用户输入作为 `iterateInput`。
-
-### 3. 上下文采集 (Context Gathering) - Agent 核心能力
-
-**这是区别于普通优化器的关键步骤。**
-
-在生成 Prompt 之前，Agent **必须**判断：完成该任务是否依赖当前项目的具体信息？
-
-- **如果是**（例如涉及代码、架构、特定文件）：
-  - **主动探索**: 立即使用工具 (`ls`, `read`, `glob`, `grep`) 扫描相关文件结构、读取关键代码或配置文件。
-  - **信息提取**: 识别项目的技术栈、代码规范、依赖版本等关键元数据。
-- **如果否**（通用型任务）：
-  - 跳过此步骤。
-
-**目的**: 确保最终生成的 Prompt 是**基于事实**的，而非基于幻觉或通用模板的。
+判断任务是否依赖项目信息：
+- **是**：使用 `ls`/`read`/`glob`/`grep` 探索项目结构，提取技术栈和规范
+- **否**：跳过
 
 ### 4. 优化生成
 
-1. 读取模板: `templates/{lang}/{type}-optimize/{mode}.md`
-   - iterate 类型: `templates/{lang}/iterate/general.md`
-2. 替换占位符后，按模板指令生成优化后的提示词
+读取模板并替换占位符，生成优化后的提示词。
 
-### 4. 深度评审 (Critical Review)
+### 5. 深度评审
 
-1. 读取评审模板: `templates/{lang}/evaluation/critical-review.md`
-2. 将优化后的提示词传入，生成**深度评审报告** (Critical Review Report)
-3. 重点检测：歧义表达、边界盲区、逻辑冲突
+读取 `critical-review.md`，检测歧义、边界盲区、逻辑冲突。
 
-### 5. 综合评估 (Final Evaluation)
+### 6. 综合评估
 
-1. 读取评估模板: `templates/{lang}/evaluation/user.md`
-2. **关键**: 将「深度评审报告」作为 `{{reviewReport}}` 传入评估模板
-3. 结合评审发现的逻辑盲区，对优化结果进行客观评分
-4. 生成详细评估报告
+读取 `evaluation/user.md`，将评审报告作为 `{{reviewReport}}` 传入，生成评分（0-100）。
 
-### 6. 输出
+### 7. 输出展示
 
-向用户展示：
-1. **优化后的提示词** — 使用代码块格式
-2. **深度评审摘要** — 简要展示发现的潜在理解偏差
-3. **评估报告** — 包含分数、维度评价和改进建议
-4. **当前模式** — 在报告中注明使用的优化模式
+简要提示优化完成，不输出完整内容：
 
-### 7. 交互式确认 (可选)
-
-当需要用户确认优化结果时，可调用 WebView 桌面应用进行交互：
-
-```bash
-# 调用 WebView 应用
-webui/bin/prompt-optimizer-webview --input <input.json> --output <result.json> --timeout 600
+```
+优化完成，评分: XX/100 ([等级])
+正在打开交互界面...
 ```
 
-**输入文件格式 (input.json)**:
-```json
-{
-  "version": 3,
-  "originalPrompt": "原始提示词",
-  "current": {
-    "iterationId": "iter-003",
-    "optimizedPrompt": "优化后的提示词 (Markdown)",
-    "reviewReport": "评审报告 (Markdown)",
-    "evaluationReport": "评估报告 (Markdown)",
-    "score": 85,
-    "suggestedDirections": [
-      {"id": "examples", "label": "添加示例", "description": "补充使用案例"}
-    ]
-  },
-  "history": []
-}
+**注意**: 所有详细信息通过 WebView 展示，不在终端输出完整的提示词和报告。
+
+### 8. WebView 交互循环 ⚠️ 必须执行
+
+**重要**: 此步骤是必须的用户确认环节，不可跳过。
+
+调用 WebView 应用进行交互确认，进入优化循环：
+
+```
+┌─────────────────────────────────────────┐
+│  优化循环 (在同一个 Session 内)          │
+│                                         │
+│  显示当前结果 → 用户操作：               │
+│  ├─ submit → 更新 session.json → 迭代优化│
+│  ├─ rollback → 恢复历史 → 迭代优化       │
+│  └─ cancel/timeout → 结束 Session        │
+│                                         │
+└─────────────────────────────────────────┘
 ```
 
-**输出结果格式 (result.json)**:
-```json
-// 用户确认
-{"action": "submit", "selectedDirections": ["examples"], "userInput": "补充说明"}
+⚠️ **警告**:
+- 每次优化完成后必须调用 WebView
+- 不要直接结束流程，等待用户在 WebView 中做出选择
+- 仅当 WebView 二进制不存在时才可跳过
 
-// 用户取消
-{"action": "cancel", "selectedDirections": [], "userInput": ""}
-
-// 超时
-{"action": "timeout", "selectedDirections": [], "userInput": ""}
-
-// 回滚到历史版本
-{"action": "rollback", "rollbackToIteration": "iter-001", "selectedDirections": [], "userInput": ""}
-```
+详见 [WebView 指南](references/webview-guide.md)。
 
 ## 错误处理
 
-| 情况 | 处理方式 |
-|-----|---------|
-| iterate 找不到历史提示词 | 提示用户：无法自动获取上下文，请直接提供提示词内容 |
-| 无效的模式 | 列出可用模式，请用户选择 |
-| 模板文件不存在 | 回退到英文模板，通知用户 |
+| 情况 | 处理 |
+|-----|-----|
+| 无有效内容 | 提示用户提供提示词内容 |
+| 模板不存在 | 回退英文模板 |
+| WebView 应用不存在 | 直接输出结果，跳过交互 |
+| Session 目录创建失败 | 输出错误信息，终止流程 |
 
-## 详细文档
+## 参考文档
 
-- [完整工作流程](docs/workflow.md)
+| 文档 | 说明 |
+|-----|------|
+| [执行指南](references/execution-guide.md) | 完整执行流程，Phase 1-8 详解 |
+| [WebView 指南](references/webview-guide.md) | 交互确认核心组件，输入输出格式 |
+| [模板规范](references/templates-spec.md) | 占位符、目录结构、评估维度 |

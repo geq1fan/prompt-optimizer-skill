@@ -56,7 +56,7 @@ export namespace main {
 		    if (!a) {
 		        return a;
 		    }
-		    if (a.slice) {
+		    if (a.slice && a.map) {
 		        return (a as any[]).map(elem => this.convertValues(elem, classs));
 		    } else if ("object" === typeof a) {
 		        if (asMap) {
@@ -96,7 +96,7 @@ export namespace main {
 		    if (!a) {
 		        return a;
 		    }
-		    if (a.slice) {
+		    if (a.slice && a.map) {
 		        return (a as any[]).map(elem => this.convertValues(elem, classs));
 		    } else if ("object" === typeof a) {
 		        if (asMap) {
@@ -132,7 +132,7 @@ export namespace main {
 		    if (!a) {
 		        return a;
 		    }
-		    if (a.slice) {
+		    if (a.slice && a.map) {
 		        return (a as any[]).map(elem => this.convertValues(elem, classs));
 		    } else if ("object" === typeof a) {
 		        if (asMap) {
@@ -146,7 +146,58 @@ export namespace main {
 		    return a;
 		}
 	}
-	
+	export class SessionData {
+	    version: number;
+	    sessionId: string;
+	    createdAt: string;
+	    updatedAt: string;
+	    projectPath: string;
+	    lang: string;
+	    mode: string;
+	    originalPrompt: string;
+	    current: IterationData;
+	    history: HistoryItem[];
+	    lastAction?: string;
+	    status: string;
+
+	    static createFrom(source: any = {}) {
+	        return new SessionData(source);
+	    }
+
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.version = source["version"];
+	        this.sessionId = source["sessionId"];
+	        this.createdAt = source["createdAt"];
+	        this.updatedAt = source["updatedAt"];
+	        this.projectPath = source["projectPath"];
+	        this.lang = source["lang"];
+	        this.mode = source["mode"];
+	        this.originalPrompt = source["originalPrompt"];
+	        this.current = this.convertValues(source["current"], IterationData);
+	        this.history = this.convertValues(source["history"], HistoryItem);
+	        this.lastAction = source["lastAction"];
+	        this.status = source["status"];
+	    }
+
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 
 }
 

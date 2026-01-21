@@ -100,14 +100,14 @@ func TestNewApp_ValidInput(t *testing.T) {
 	if app == nil {
 		t.Fatal("NewApp returned nil app")
 	}
-	if app.inputData == nil {
+	if app.sessionData == nil {
 		t.Fatal("NewApp did not load input data")
 	}
-	if app.inputData.Version != 1 {
-		t.Errorf("expected version 1, got %d", app.inputData.Version)
+	if app.sessionData.Version != 4 {
+		t.Errorf("expected version 4 (migrated from v1), got %d", app.sessionData.Version)
 	}
-	if app.inputData.OriginalPrompt != "Test original prompt" {
-		t.Errorf("unexpected original prompt: %s", app.inputData.OriginalPrompt)
+	if app.sessionData.OriginalPrompt != "Test original prompt" {
+		t.Errorf("unexpected original prompt: %s", app.sessionData.OriginalPrompt)
 	}
 	if app.timeout != 600 {
 		t.Errorf("expected timeout 600, got %d", app.timeout)
@@ -205,11 +205,11 @@ func TestNewApp_WithHistory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewApp failed: %v", err)
 	}
-	if len(app.inputData.History) != 2 {
-		t.Errorf("expected 2 history items, got %d", len(app.inputData.History))
+	if len(app.sessionData.History) != 2 {
+		t.Errorf("expected 2 history items, got %d", len(app.sessionData.History))
 	}
-	if app.inputData.History[0].IterationID != "iter-001" {
-		t.Errorf("unexpected first history iteration ID: %s", app.inputData.History[0].IterationID)
+	if app.sessionData.History[0].IterationID != "iter-001" {
+		t.Errorf("unexpected first history iteration ID: %s", app.sessionData.History[0].IterationID)
 	}
 }
 
@@ -231,8 +231,8 @@ func TestGetInputData_ReturnsCorrectData(t *testing.T) {
 	if result == nil {
 		t.Fatal("GetInputData returned nil")
 	}
-	if result.Version != inputData.Version {
-		t.Errorf("expected version %d, got %d", inputData.Version, result.Version)
+	if result.Version != 4 {
+		t.Errorf("expected version 4 (migrated), got %d", result.Version)
 	}
 	if result.Current.Score != inputData.Current.Score {
 		t.Errorf("expected score %d, got %d", inputData.Current.Score, result.Current.Score)
@@ -704,10 +704,10 @@ func TestNewApp_EmptyDirections(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewApp failed: %v", err)
 	}
-	if len(app.inputData.Current.SuggestedDirections) != 0 {
+	if len(app.sessionData.Current.SuggestedDirections) != 0 {
 		t.Errorf("expected empty directions")
 	}
-	if app.inputData.History != nil {
+	if app.sessionData.History != nil {
 		t.Errorf("expected nil history")
 	}
 }
@@ -736,10 +736,10 @@ func TestNewApp_UnicodeContent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewApp failed with unicode content: %v", err)
 	}
-	if app.inputData.OriginalPrompt != inputData.OriginalPrompt {
+	if app.sessionData.OriginalPrompt != inputData.OriginalPrompt {
 		t.Errorf("unicode original prompt not preserved")
 	}
-	if app.inputData.Current.SuggestedDirections[0].Label != "中文标签" {
+	if app.sessionData.Current.SuggestedDirections[0].Label != "中文标签" {
 		t.Errorf("unicode direction label not preserved")
 	}
 }

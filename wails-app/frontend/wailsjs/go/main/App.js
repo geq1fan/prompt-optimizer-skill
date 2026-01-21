@@ -14,6 +14,14 @@ export function GetRemainingSeconds() {
   return window['go']['main']['App']['GetRemainingSeconds']();
 }
 
+export function GetSessionData() {
+  return window['go']['main']['App']['GetSessionData']();
+}
+
+export function GetTimeoutSeconds() {
+  return window['go']['main']['App']['GetTimeoutSeconds']();
+}
+
 export function Rollback(arg1, arg2, arg3) {
   return window['go']['main']['App']['Rollback'](arg1, arg2, arg3);
 }

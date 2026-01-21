@@ -9,6 +9,7 @@ A Claude Code skill that optimizes prompts based on **Project Context**.
 - **Smart optimization**: Automatically detects prompt complexity and applies the right strategy
 - **Clear evaluation**: Get a 0–100 score plus concrete strengths/weaknesses feedback
 - **Iterative improvements**: Continuously refine prompts with targeted instructions
+- **Interactive confirmation**: Desktop WebView app for reviewing and confirming optimization results
 - **Ready-to-use output**: Returns a formatted prompt you can copy directly
 
 ## Installation
@@ -64,6 +65,7 @@ git clone https://github.com/geq1fan/prompt-optimizer-skill ~/.claude/skills/pro
 2. **Choose a strategy**: Selects an optimization approach based on complexity
 3. **Enhance**: Improves the prompt while preserving intent
 4. **Evaluate**: Provides actionable feedback and a score
+5. **Interactive Review**: Use the WebView app to review and confirm the optimized prompt
 
 ## Contributing
 

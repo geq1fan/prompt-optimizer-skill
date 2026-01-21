@@ -46,11 +46,12 @@ func main() {
 
 	// 创建 Wails 应用
 	err = wails.Run(&options.App{
-		Title:     "Prompt Optimizer",
-		Width:     1000,
-		Height:    700,
-		MinWidth:  800,
-		MinHeight: 600,
+		Title:       "Prompt Optimizer",
+		Width:       1000,
+		Height:      700,
+		MinWidth:    800,
+		MinHeight:   600,
+		AlwaysOnTop: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

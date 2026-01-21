@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prompt Optimizer</title>
   <link rel="stylesheet" href="src/styles.css">
+  <!-- Markdown 渲染库 -->
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+  <!-- Diff 对比库 -->
+  <script src="https://cdn.jsdelivr.net/npm/diff/dist/diff.min.js"></script>
 </head>
 <body>
   <!-- Loading 骨架屏 -->
@@ -56,7 +60,12 @@
         <h1 class="window-title">Prompt Optimizer</h1>
       </div>
       <div class="header-right">
-        <span id="countdown" class="countdown">10:00</span>
+        <div class="countdown-bar">
+          <div class="progress-track">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <span id="countdown" class="countdown-text">10:00</span>
+        </div>
       </div>
     </header>
 
@@ -64,12 +73,12 @@
     <div class="toolbar">
       <div class="toolbar-left">
         <button class="toolbar-btn active" id="current-version-btn">
-          <span>当前版本</span>
+          <span data-i18n="currentVersion">当前版本</span>
           <span id="version-badge" class="version-badge">v1</span>
         </button>
         <div class="history-dropdown-wrapper">
           <button class="toolbar-btn" id="history-btn" onclick="toggleHistoryDropdown()">
-            <span>历史记录</span>
+            <span data-i18n="history">历史记录</span>
             <svg class="icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -77,114 +86,179 @@
           <div id="history-dropdown" class="history-dropdown hidden"></div>
         </div>
         <button class="toolbar-btn" id="compare-btn" onclick="showCompareView()">
-          <span>版本对比</span>
+          <span data-i18n="versionCompare">版本对比</span>
+        </button>
+      </div>
+      <!-- 历史版本查看指示器 -->
+      <div id="history-viewing-indicator" class="history-viewing-indicator hidden">
+        <svg class="viewing-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 4V8L10.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <span data-i18n="viewingHistory">正在查看</span>
+        <span id="viewing-version-number" class="viewing-version-number">v1</span>
+        <button class="return-current-btn" onclick="switchToVersion(null)" data-i18n="returnToCurrent">返回当前版本</button>
+      </div>
+      <!-- 工具栏右侧 -->
+      <div class="toolbar-right">
+        <button id="continue-from-history-btn" class="toolbar-btn primary hidden" onclick="continueFromViewingVersion()" data-i18n="continueFromThisVersion">
+          基于此版本继续优化
         </button>
       </div>
     </div>
 
     <!-- 主内容区 -->
     <main class="content-area">
-      <!-- 评分区 + 报告区 -->
-      <div class="score-report-section">
-        <!-- 评分环形图 -->
-        <div class="score-section">
-          <div class="score-ring-container">
-            <svg class="score-ring" viewBox="0 0 160 160">
-              <circle class="score-ring-bg" cx="80" cy="80" r="70" fill="none" stroke-width="10"/>
-              <circle id="score-ring-progress" class="score-ring-progress" cx="80" cy="80" r="70" fill="none" stroke-width="10" stroke-linecap="round"/>
-            </svg>
-            <div class="score-text">
-              <span id="score-value" class="score-value">0</span>
-              <span class="score-max">/100</span>
+      <!-- Bento Grid 布局 -->
+      <div class="bento-grid">
+        <!-- 评分英雄卡片 + 悬浮评估报告 -->
+        <div class="bento-card score-hero" id="score-card">
+          <!-- 评分环形图 -->
+          <div class="score-ring-wrapper">
+            <div class="score-ring-container">
+              <svg class="score-ring" viewBox="0 0 200 200">
+                <defs>
+                  <linearGradient id="score-gradient-excellent" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#34D399"/>
+                    <stop offset="100%" stop-color="#10B981"/>
+                  </linearGradient>
+                  <linearGradient id="score-gradient-good" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#60A5FA"/>
+                    <stop offset="100%" stop-color="#3B82F6"/>
+                  </linearGradient>
+                  <linearGradient id="score-gradient-fair" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FBBF24"/>
+                    <stop offset="100%" stop-color="#F59E0B"/>
+                  </linearGradient>
+                  <linearGradient id="score-gradient-poor" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#F87171"/>
+                    <stop offset="100%" stop-color="#EF4444"/>
+                  </linearGradient>
+                </defs>
+                <circle class="score-ring-bg" cx="100" cy="100" r="85" fill="none" stroke-width="12"/>
+                <circle id="score-ring-progress" class="score-ring-progress" cx="100" cy="100" r="85" fill="none" stroke-width="12" stroke-linecap="round"/>
+              </svg>
+              <div class="score-text">
+                <span id="score-value" class="score-value">0</span>
+                <span class="score-max">/100</span>
+              </div>
             </div>
           </div>
-          <div id="score-grade" class="score-grade">-</div>
-        </div>
-
-        <!-- 报告区 (Tab) -->
-        <div class="report-section">
-          <div class="segmented-control">
-            <button class="segment active" data-tab="review" onclick="switchTab('review')">评审报告</button>
-            <button class="segment" data-tab="evaluation" onclick="switchTab('evaluation')">评估报告</button>
-            <div class="segment-indicator"></div>
+          <!-- 评分等级 -->
+          <div class="score-meta">
+            <div id="score-grade" class="score-grade">-</div>
           </div>
-          <div class="report-content">
-            <div id="review-report" class="report-panel active"></div>
-            <div id="evaluation-report" class="report-panel hidden"></div>
+
+          <!-- 悬浮弹出层：评估报告 -->
+          <div class="score-popover" id="score-popover">
+            <div class="popover-header" data-i18n="evaluationReport">评估报告</div>
+            <div id="evaluation-report" class="popover-content"></div>
           </div>
         </div>
-      </div>
 
-      <!-- 优化后的提示词 -->
-      <div class="prompt-section">
-        <div class="prompt-header">
-          <h3>优化后的提示词</h3>
-          <button class="copy-btn" onclick="copyPrompt()" title="复制">
-            <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M3 11V3C3 2.44772 3.44772 2 4 2H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <span class="copy-text">复制</span>
-          </button>
+        <!-- 评审报告（独享右侧卡片） -->
+        <div class="bento-card report-card">
+          <div id="review-report" class="report-content markdown-content scrollable"></div>
         </div>
-        <div id="optimized-prompt" class="prompt-content"></div>
-      </div>
 
-      <!-- 评分进度条 + 原始 Prompt -->
-      <div class="meta-section">
-        <div class="score-bar-container">
-          <span class="score-bar-label">评分:</span>
-          <div class="score-bar">
-            <div id="score-bar-fill" class="score-bar-fill"></div>
+        <!-- 优化后的提示词 -->
+        <div class="bento-card bento-wide prompt-card">
+          <div class="prompt-header">
+            <div class="prompt-title-group">
+              <h3 data-i18n="optimizedPrompt">优化后的提示词</h3>
+              <button class="view-original-btn" onclick="showOriginalPrompt()">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 8C2 8 4 4 8 4C12 4 14 8 14 8C14 8 12 12 8 12C4 12 2 8 2 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <span data-i18n="viewOriginal">查看原始输入</span>
+              </button>
+            </div>
+            <div class="prompt-actions">
+              <!-- 模式切换 -->
+              <div class="prompt-mode-toggle">
+                <button class="mode-btn active" id="mode-render-btn" onclick="switchPromptMode('render')" title="渲染模式">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+                <button class="mode-btn" id="mode-source-btn" onclick="switchPromptMode('source')" title="源码模式">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M5 4L2 8l3 4M11 4l3 4-3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+              <button class="copy-btn" onclick="copyPrompt()" title="复制">
+                <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M3 11V3C3 2.44772 3.44772 2 4 2H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span class="copy-text" data-i18n="copy">复制</span>
+              </button>
+            </div>
           </div>
-          <span id="score-bar-value" class="score-bar-value">0/100</span>
+          <!-- 渲染模式显示 -->
+          <div id="optimized-prompt" class="prompt-content"></div>
+          <!-- 源码编辑模式 -->
+          <textarea id="optimized-prompt-source" class="prompt-source hidden" placeholder="编辑提示词源码..."></textarea>
         </div>
-        <button class="original-prompt-btn" onclick="showOriginalPrompt()">
-          <span>原始 Prompt:</span>
-          <span class="link-text">查看原始输入</span>
-        </button>
-      </div>
 
-      <!-- 优化方向选择 -->
-      <div class="directions-section">
-        <h3 class="section-title">优化方向选择</h3>
-        <div id="direction-cards" class="direction-cards"></div>
-      </div>
-
-      <!-- 补充说明输入 -->
-      <div class="input-section">
-        <div class="input-header">
-          <label for="user-input">补充说明 (可选)</label>
-          <span id="char-count" class="char-count">0 / 2000</span>
+        <!-- 优化方向选择 - 胶囊标签云 -->
+        <div class="bento-card bento-wide tags-card">
+          <h3 class="tags-title" data-i18n="directionTitle">优化方向选择</h3>
+          <div id="direction-cards" class="tags-cloud"></div>
         </div>
-        <textarea id="user-input" class="user-input" placeholder="请输入您的补充说明，帮助 AI 更好地理解您的需求..." maxlength="2000"></textarea>
+
+        <!-- 补充说明输入 -->
+        <div class="bento-card bento-wide input-card">
+          <div class="input-header">
+            <label for="user-input" data-i18n="inputLabel">补充说明 (可选)</label>
+            <span id="char-count" class="char-count">0 / 2000</span>
+          </div>
+          <textarea id="user-input" class="user-input" data-i18n-placeholder="inputPlaceholder" placeholder="请输入您的补充说明，帮助 AI 更好地理解您的需求..." maxlength="2000"></textarea>
+        </div>
       </div>
     </main>
 
     <!-- 底部按钮 -->
     <footer class="footer">
-      <button class="btn btn-secondary" onclick="handleCancel()">取消</button>
-      <button id="submit-btn" class="btn btn-primary" onclick="handleSubmit()">确定</button>
+      <button class="btn btn-secondary" onclick="handleCancel()" data-i18n="cancel">取消</button>
+      <button id="submit-btn" class="btn btn-primary" onclick="handleSubmit()" data-i18n="confirm">确定</button>
     </footer>
   </div>
 
   <!-- 版本对比视图 -->
   <div id="compare-view" class="compare-view hidden">
     <header class="compare-header">
-      <h2>版本对比</h2>
+      <h2 data-i18n="compareTitle">版本对比</h2>
       <button class="back-btn" onclick="hideCompareView()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span>返回</span>
+        <span data-i18n="back">返回</span>
       </button>
     </header>
     <div class="compare-selector">
       <select id="compare-left" class="compare-select" onchange="updateComparison()"></select>
-      <span class="compare-arrow">↔</span>
+      <span class="compare-arrow">→</span>
       <select id="compare-right" class="compare-select" onchange="updateComparison()"></select>
+      <!-- Diff 模式切换 -->
+      <div class="diff-mode-toggle">
+        <button class="diff-mode-btn" id="diff-unified-btn" onclick="switchDiffMode('unified')" data-i18n="unifiedDiff">统一对比</button>
+        <button class="diff-mode-btn active" id="diff-split-btn" onclick="switchDiffMode('split')" data-i18n="splitDiff">并排对比</button>
+      </div>
     </div>
-    <div class="compare-panels">
+    <!-- 统一 Diff 视图 -->
+    <div id="compare-unified" class="compare-unified hidden">
+      <div class="compare-unified-header">
+        <span id="compare-unified-left-label" class="diff-label diff-removed">v1</span>
+        <span class="diff-arrow">→</span>
+        <span id="compare-unified-right-label" class="diff-label diff-added">v2</span>
+      </div>
+      <div id="compare-unified-content" class="compare-unified-content"></div>
+    </div>
+    <!-- 并排对比视图 -->
+    <div id="compare-split" class="compare-panels">
       <div class="compare-panel">
         <div id="compare-left-header" class="compare-panel-header">v1 (0分)</div>
         <div id="compare-left-content" class="compare-panel-content"></div>
@@ -195,7 +269,7 @@
       </div>
     </div>
     <div class="compare-footer">
-      <button id="rollback-from-compare-btn" class="btn btn-primary" onclick="rollbackFromCompare()">
+      <button id="rollback-from-compare-btn" class="btn btn-primary" onclick="rollbackFromCompare()" data-i18n="continueFromLeft">
         基于左侧版本继续优化
       </button>
     </div>
@@ -206,7 +280,7 @@
     <div class="modal-backdrop" onclick="hideOriginalPrompt()"></div>
     <div class="modal-content original-prompt-modal">
       <div class="modal-header">
-        <h3>原始 Prompt</h3>
+        <h3 data-i18n="originalPromptTitle">原始 Prompt</h3>
         <button class="modal-close" onclick="hideOriginalPrompt()">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -225,6 +299,6 @@
     </svg>
   </div>
 
-  <script src="src/main.js"></script>
+  <script type="module" src="src/main.js"></script>
 </body>
 </html>

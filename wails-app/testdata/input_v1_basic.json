@@ -11,17 +11,17 @@
       {
         "id": "error-handling",
         "label": "错误处理",
-        "description": "补充登录失败、网络错误等异常情况的处理方式"
+        "description": "添加登录失败、网络错误等场景的处理逻辑"
       },
       {
         "id": "ui-style",
-        "label": "UI 风格",
-        "description": "明确具体的设计风格，如现代扁平、毛玻璃效果等"
+        "label": "UI风格",
+        "description": "明确定义具体的视觉风格（如毛玻璃效果、扁平化设计等）"
       },
       {
         "id": "security",
-        "label": "安全增强",
-        "description": "添加 CSRF 防护、密码加密等安全措施"
+        "label": "安全性",
+        "description": "添加密码强度要求、防暴力破解等安全措施"
       }
     ]
   },

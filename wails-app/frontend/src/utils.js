@@ -1,5 +1,7 @@
 // ========== 纯函数 - 可独立测试 ==========
 
+import { t } from './i18n/index.js';
+
 /**
  * 根据分数返回等级 CSS 类名
  * @param {number} score - 分数 (0-100)
@@ -18,10 +20,10 @@ export function getScoreGradeClass(score) {
  * @returns {string} 等级文字
  */
 export function getScoreGradeText(score) {
-  if (score <= 40) return 'Poor';
-  if (score <= 60) return 'Fair';
-  if (score <= 80) return 'Good';
-  return 'Excellent';
+  if (score <= 40) return t('scorePoor');
+  if (score <= 60) return t('scoreFair');
+  if (score <= 80) return t('scoreGood');
+  return t('scoreExcellent');
 }
 
 /**
@@ -151,27 +153,4 @@ export function getVersionData(inputData, id) {
   }
 
   return { version: 0, score: 0, optimizedPrompt: '' };
-}
-
-/**
- * 格式化倒计时显示
- * @param {number} seconds - 剩余秒数
- * @returns {string} 格式化后的时间字符串 (mm:ss)
- */
-export function formatCountdown(seconds) {
-  if (seconds < 0) seconds = 0;
-  const minutes = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
-}
-
-/**
- * 获取倒计时状态类名
- * @param {number} seconds - 剩余秒数
- * @returns {string} 状态类名
- */
-export function getCountdownStatusClass(seconds) {
-  if (seconds < 30) return 'critical';
-  if (seconds < 60) return 'warning';
-  return '';
 }

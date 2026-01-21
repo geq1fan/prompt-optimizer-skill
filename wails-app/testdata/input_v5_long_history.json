@@ -1,5 +1,11 @@
 {
   "version": 5,
+  "sessionId": "session_1705600000000",
+  "createdAt": "2026-01-22T08:00:00Z",
+  "updatedAt": "2026-01-22T09:30:00Z",
+  "projectPath": "/path/to/python-project",
+  "lang": "cn",
+  "mode": "professional",
   "originalPrompt": "帮我优化代码性能",
   "current": {
     "iterationId": "iter-005",
@@ -65,5 +71,7 @@
         "userInput": "添加项目具体上下文"
       }
     }
-  ]
+  ],
+  "lastAction": "submit",
+  "status": "active"
 }

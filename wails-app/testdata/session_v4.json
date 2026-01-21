@@ -1,0 +1,49 @@
+{
+  "version": 4,
+  "sessionId": "session_1705632000000",
+  "createdAt": "2026-01-22T10:00:00Z",
+  "updatedAt": "2026-01-22T10:05:00Z",
+  "projectPath": "/path/to/project",
+  "lang": "cn",
+  "mode": "professional",
+  "originalPrompt": "帮我实现一个用户认证系统",
+  "current": {
+    "iterationId": "iter-002",
+    "optimizedPrompt": "# Role: 后端开发专家\n\n## Profile\n- Author: prompt-optimizer\n- Version: 2.0.0\n- Language: 中文\n- Description: 专业的用户认证系统开发专家\n\n## Background\n用户需要一个完整的认证系统，包括注册、登录、JWT 令牌管理。\n\n## Goals\n1. 实现用户注册功能\n2. 实现用户登录功能\n3. JWT 令牌生成和验证\n4. 密码加密存储\n\n## Constraints\n- 使用 bcrypt 加密密码\n- JWT 有效期 24 小时\n- 支持刷新令牌\n\n## OutputFormat\n输出完整的 TypeScript 代码，包含单元测试。",
+    "reviewReport": "### 深度评审报告\n\n**1. 潜在的理解偏差**:\n- JWT 刷新机制未详细说明\n\n**2. 逻辑与边界盲区**:\n- 未说明并发登录的处理策略\n\n**3. 健壮性结论**: \n良好 - 核心逻辑完整，细节可进一步完善",
+    "evaluationReport": "## 评估报告\n\n**总分**: 85 (良好)\n\n### 维度评分\n- **任务表达**: 90 - 目标非常明确\n- **信息完整性**: 80 - 核心信息完整\n- **格式规范性**: 88 - 结构清晰专业\n- **改进程度**: 82 - 相比上一版有明显提升\n\n### 核心优势\n- 清晰的安全要求\n- 完整的技术规范\n\n### 改进建议\n- 补充刷新令牌的详细流程\n- 说明并发登录策略",
+    "score": 85,
+    "suggestedDirections": [
+      {
+        "id": "refresh-token",
+        "label": "完善刷新令牌",
+        "description": "详细说明刷新令牌的生成、存储和验证流程"
+      },
+      {
+        "id": "concurrent-login",
+        "label": "并发登录策略",
+        "description": "定义同一用户多设备登录时的处理方式"
+      },
+      {
+        "id": "error-codes",
+        "label": "错误码规范",
+        "description": "定义认证相关的标准错误码和消息"
+      }
+    ]
+  },
+  "history": [
+    {
+      "iterationId": "iter-001",
+      "optimizedPrompt": "# Role: 后端开发专家\n\n请帮我实现一个用户认证系统，包括登录和注册功能。",
+      "reviewReport": "### 评审报告\n\n需要更多安全相关的细节说明",
+      "evaluationReport": "**总分**: 65 (中等)\n\n缺少安全要求和技术规范",
+      "score": 65,
+      "userFeedback": {
+        "selectedDirections": ["security", "specs"],
+        "userInput": "请添加安全要求，包括密码加密和JWT配置"
+      }
+    }
+  ],
+  "lastAction": "submit",
+  "status": "active"
+}

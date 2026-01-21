@@ -2,6 +2,7 @@ import { describe, test, expect, beforeAll } from 'vitest';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { setLocale } from './i18n/index.js';
 import {
   getScoreGradeClass,
   getScoreGradeText,
@@ -9,8 +10,6 @@ import {
   parseMarkdown,
   findHistoryItem,
   getVersionData,
-  formatCountdown,
-  getCountdownStatusClass,
 } from './utils.js';
 
 // 获取 testdata 目录路径
@@ -62,6 +61,7 @@ describe('Integration: Basic Input (v1)', () => {
   });
 
   test('getScoreGradeText returns correct text', () => {
+    setLocale('en-US');
     expect(getScoreGradeText(inputData.current.score)).toBe('Good');
   });
 });
@@ -109,6 +109,70 @@ describe('Integration: Input with History (v3)', () => {
     const data = getVersionData(inputData, 'iter-001');
     expect(data.version).toBe(1);
     expect(data.score).toBe(55);
+  });
+});
+
+describe('Integration: Session Data (v4)', () => {
+  let sessionData;
+
+  beforeAll(() => {
+    sessionData = loadTestData('session_v4.json');
+  });
+
+  test('loads version correctly', () => {
+    expect(sessionData.version).toBe(4);
+  });
+
+  test('has sessionId', () => {
+    expect(sessionData.sessionId).toBe('session_1705632000000');
+  });
+
+  test('has timestamps', () => {
+    expect(sessionData.createdAt).toBe('2026-01-22T10:00:00Z');
+    expect(sessionData.updatedAt).toBe('2026-01-22T10:05:00Z');
+  });
+
+  test('has project metadata', () => {
+    expect(sessionData.projectPath).toBe('/path/to/project');
+    expect(sessionData.lang).toBe('cn');
+    expect(sessionData.mode).toBe('professional');
+  });
+
+  test('has status and lastAction', () => {
+    expect(sessionData.status).toBe('active');
+    expect(sessionData.lastAction).toBe('submit');
+  });
+
+  test('loads current iteration', () => {
+    expect(sessionData.current.iterationId).toBe('iter-002');
+    expect(sessionData.current.score).toBe(85);
+  });
+
+  test('has suggested directions', () => {
+    expect(sessionData.current.suggestedDirections).toHaveLength(3);
+    expect(sessionData.current.suggestedDirections[0].id).toBe('refresh-token');
+  });
+
+  test('loads history with correct count', () => {
+    expect(sessionData.history).toHaveLength(1);
+    expect(sessionData.history[0].iterationId).toBe('iter-001');
+    expect(sessionData.history[0].score).toBe(65);
+  });
+
+  test('history item has user feedback', () => {
+    const feedback = sessionData.history[0].userFeedback;
+    expect(feedback.selectedDirections).toContain('security');
+    expect(feedback.userInput).toBeTruthy();
+  });
+
+  test('getScoreGradeClass returns correct class for current score', () => {
+    // Score 85 is > 80, so it should be 'excellent'
+    expect(getScoreGradeClass(sessionData.current.score)).toBe('excellent');
+  });
+
+  test('getVersionData works with session data', () => {
+    const data = getVersionData(sessionData, 'current');
+    expect(data.score).toBe(85);
   });
 });
 
@@ -262,26 +326,6 @@ describe('Integration: Markdown Content Parsing', () => {
       expect(result).toContain('<pre>');
       expect(result).toContain('<code>');
     }
-  });
-});
-
-describe('Integration: Countdown Formatting', () => {
-  test('formatCountdown for typical remaining time', () => {
-    expect(formatCountdown(600)).toBe('10:00');
-    expect(formatCountdown(300)).toBe('5:00');
-    expect(formatCountdown(90)).toBe('1:30');
-  });
-
-  test('getCountdownStatusClass for warning states', () => {
-    expect(getCountdownStatusClass(600)).toBe('');
-    expect(getCountdownStatusClass(59)).toBe('warning');
-    expect(getCountdownStatusClass(29)).toBe('critical');
-  });
-
-  test('countdown edge cases', () => {
-    expect(formatCountdown(0)).toBe('0:00');
-    expect(formatCountdown(-10)).toBe('0:00');
-    expect(getCountdownStatusClass(0)).toBe('critical');
   });
 });
 

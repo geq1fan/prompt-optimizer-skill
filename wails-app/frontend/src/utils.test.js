@@ -1,4 +1,5 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, beforeEach } from 'vitest';
+import { setLocale } from './i18n/index.js';
 import {
   getScoreGradeClass,
   getScoreGradeText,
@@ -6,8 +7,6 @@ import {
   parseMarkdown,
   findHistoryItem,
   getVersionData,
-  formatCountdown,
-  getCountdownStatusClass,
 } from './utils.js';
 
 // ========== getScoreGradeClass 测试 ==========
@@ -42,6 +41,11 @@ describe('getScoreGradeClass', () => {
 // ========== getScoreGradeText 测试 ==========
 
 describe('getScoreGradeText', () => {
+  beforeEach(() => {
+    // 设置为英文以匹配原有测试期望值
+    setLocale('en-US');
+  });
+
   test.each([
     [0, 'Poor'],
     [40, 'Poor'],
@@ -53,6 +57,14 @@ describe('getScoreGradeText', () => {
     [100, 'Excellent'],
   ])('score %i returns "%s"', (score, expected) => {
     expect(getScoreGradeText(score)).toBe(expected);
+  });
+
+  test('returns Chinese text when locale is zh-CN', () => {
+    setLocale('zh-CN');
+    expect(getScoreGradeText(30)).toBe('较差');
+    expect(getScoreGradeText(50)).toBe('一般');
+    expect(getScoreGradeText(70)).toBe('良好');
+    expect(getScoreGradeText(90)).toBe('优秀');
   });
 });
 
@@ -263,49 +275,5 @@ describe('getVersionData', () => {
     const data = { version: 1, current: { score: 50 }, history: [] };
     const result = getVersionData(data, 'iter-001');
     expect(result.version).toBe(0);
-  });
-});
-
-// ========== formatCountdown 测试 ==========
-
-describe('formatCountdown', () => {
-  test.each([
-    [0, '0:00'],
-    [30, '0:30'],
-    [59, '0:59'],
-    [60, '1:00'],
-    [90, '1:30'],
-    [600, '10:00'],
-    [3599, '59:59'],
-    [3600, '60:00'],
-  ])('%i seconds returns "%s"', (seconds, expected) => {
-    expect(formatCountdown(seconds)).toBe(expected);
-  });
-
-  test('handles negative seconds as 0:00', () => {
-    expect(formatCountdown(-10)).toBe('0:00');
-  });
-});
-
-// ========== getCountdownStatusClass 测试 ==========
-
-describe('getCountdownStatusClass', () => {
-  test('returns empty for normal time', () => {
-    expect(getCountdownStatusClass(120)).toBe('');
-    expect(getCountdownStatusClass(60)).toBe('');
-  });
-
-  test('returns warning for < 60 seconds', () => {
-    expect(getCountdownStatusClass(59)).toBe('warning');
-    expect(getCountdownStatusClass(30)).toBe('warning');
-  });
-
-  test('returns critical for < 30 seconds', () => {
-    expect(getCountdownStatusClass(29)).toBe('critical');
-    expect(getCountdownStatusClass(0)).toBe('critical');
-  });
-
-  test('returns critical for negative seconds', () => {
-    expect(getCountdownStatusClass(-5)).toBe('critical');
   });
 });
