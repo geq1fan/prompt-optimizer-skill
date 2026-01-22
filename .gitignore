@@ -1,6 +1,11 @@
 .ace-tool/
 .ccb_config/
 .claude/settings.local.json
+.sisyphus/
+
+# ========== Design Docs (local only) ==========
+backend-design.md
+frontend-design.md
 
 # ========== WebUI Dev Build ==========
 webui/bin/
