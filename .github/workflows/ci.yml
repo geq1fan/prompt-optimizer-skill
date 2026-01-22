@@ -107,6 +107,8 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
             ls -la wails-app/build/bin/prompt-optimizer-webview.exe
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            ls -la wails-app/build/bin/prompt-optimizer-webview.app
           else
             ls -la wails-app/build/bin/prompt-optimizer-webview
           fi
