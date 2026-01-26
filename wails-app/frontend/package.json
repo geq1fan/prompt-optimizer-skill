@@ -10,7 +10,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "vitest": "^1.2.0",
+    "vitest": "^4.0.18",
     "@vitest/coverage-v8": "^1.2.0"
   }
 }
