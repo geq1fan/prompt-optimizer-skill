@@ -1,16 +1,23 @@
 [English](README.md) | 中文
 
-# Prompt Optimizer
+# Prompt Optimizer 🚀
 
-一个基于 **Project Context** 进行 **Prompt优化** 的 Claude Code SKILL。
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Claude Code](https://img.shields.io/badge/Built%20for-Claude%20Code-d97757)](https://claude.ai)
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-blue)](https://github.com/geq1fan/prompt-optimizer-skill/releases)
+
+**专业的 Claude Code 技能，利用对抗性评估和项目上下文，将简单的指令转化为生产就绪的提示词。**
+
+![Prompt Optimization Workflow](assets/demo.gif)
+*一键将模糊的需求转化为结构化、无漏洞的专业提示词。*
 
 ## 功能特性
 
-- **智能优化**：自动检测提示词复杂度，应用合适的优化策略
-- **清晰评估**：获得 0-100 分的评分，以及具体的优缺点反馈
-- **迭代改进**：通过针对性指令持续优化提示词
-- **交互式确认**：桌面 WebView 应用，用于查看和确认优化结果
-- **即用输出**：优化后的提示词格式化呈现，可直接复制使用
+- **感知项目上下文 (Context-Aware)**：自动分析您的*整个项目结构*（文件、设计文档），生成深度相关的提示词，而非通用模板。
+- **对抗性测试 (Adversarial Testing)**：自动模拟 "红队测试"，在运行前发现提示词中的逻辑漏洞和边界情况。
+- **量化评估 (Quantitative Evaluation)**：基于清晰度、特异性和鲁棒性提供 0-100 分的详细评分。
+- **交互式评审 (WebView)**：原生桌面 UI (Wails)，让您无需离开工作流即可对比、编辑和确认更改。
+- **即用输出**：直接返回格式化好的提示词，可直接复制到 Claude 使用。
 
 ## 安装
 
@@ -69,14 +76,11 @@ git clone https://github.com/geq1fan/prompt-optimizer-skill ~/.claude/skills/pro
 
 ## 贡献
 
-欢迎贡献！你可以：
-- 报告问题
-- 提出改进建议
-- 提交 Pull Request
+欢迎贡献！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何提交 PR、报告问题和建议改进。
 
 ## 许可证
 
-MIT License
+本项目基于 MIT 许可证开源 - 详见 [LICENSE](LICENSE) 文件。
 
 ## 致谢
 
