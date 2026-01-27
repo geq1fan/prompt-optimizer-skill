@@ -99,18 +99,21 @@ prompt-optimizer-skill/
 
 ### WebView 应用
 
-Wails v2 应用，通过命令行参数传入 JSON 文件进行交互：
+Wails v2 应用，通过 `--session-id` 参数自动推断文件路径：
 
 ```bash
 # Windows
-bin/prompt-optimizer-webview.exe --input <input.json> --output <result.json> --timeout 600
+bin/prompt-optimizer-webview.exe --session-id <session_id>
 
 # macOS
-bin/prompt-optimizer-webview.app/Contents/MacOS/prompt-optimizer-webview --input <input.json> --output <result.json> --timeout 600
+bin/prompt-optimizer-webview.app/Contents/MacOS/prompt-optimizer-webview --session-id <session_id>
 
 # Linux
-bin/prompt-optimizer-webview --input <input.json> --output <result.json> --timeout 600
+bin/prompt-optimizer-webview --session-id <session_id>
 ```
+
+路径自动推断为 `.claude/prompt-optimizer/sessions/{session_id}/session.json` 和 `result.json`。
+目录不存在时自动创建。默认 timeout 为 600 秒，可通过 `--timeout` 覆盖。
 
 ### CI/CD
 

@@ -40,9 +40,10 @@ session_id="session_$(date +%s%3N)"
 
 ### 目录初始化
 
-```bash
-SESSION_DIR=~/.prompt-optimizer/sessions/{session_id}
-mkdir -p "$SESSION_DIR"
+Session 目录由 WebView 自动创建，无需手动创建：
+
+```
+.claude/prompt-optimizer/sessions/{session_id}/
 ```
 
 ### 清理旧 Session（可选）
@@ -51,7 +52,7 @@ mkdir -p "$SESSION_DIR"
 
 ```bash
 # 删除 30 天未更新的 Session
-find ~/.prompt-optimizer/sessions -type d -mtime +30 -exec rm -rf {} \;
+find .claude/prompt-optimizer/sessions -type d -mtime +30 -exec rm -rf {} \;
 ```
 
 ### 语言检测
@@ -292,26 +293,31 @@ templates/{lang}/evaluation/user.md
 
 ### 文件路径
 
-```bash
-SESSION_DIR=~/.prompt-optimizer/sessions/{session_id}
+WebView 自动使用项目目录下的 `.claude/prompt-optimizer/sessions/{session_id}/`：
+
+```
+SESSION_DIR=.claude/prompt-optimizer/sessions/{session_id}
 SESSION_FILE="$SESSION_DIR/session.json"
 OUTPUT_FILE="$SESSION_DIR/result.json"
 ```
 
 ### 调用命令
 
-WebView 直接读取 `session.json`，无需构造单独的 input.json：
+使用 `--session-id` 参数调用 WebView，目录自动创建：
 
 ```bash
 # Windows
-bin/prompt-optimizer-webview.exe --input "$SESSION_FILE" --output "$OUTPUT_FILE" --timeout 600
+bin/prompt-optimizer-webview.exe --session-id {session_id}
 
 # macOS
-bin/prompt-optimizer-webview.app/Contents/MacOS/prompt-optimizer-webview --input "$SESSION_FILE" --output "$OUTPUT_FILE" --timeout 600
+bin/prompt-optimizer-webview.app/Contents/MacOS/prompt-optimizer-webview --session-id {session_id}
 
 # Linux
-bin/prompt-optimizer-webview --input "$SESSION_FILE" --output "$OUTPUT_FILE" --timeout 600
+bin/prompt-optimizer-webview --session-id {session_id}
 ```
+
+可选参数：
+- `--timeout 600` - 超时秒数（默认 600）
 
 ### 结果处理
 
@@ -436,21 +442,4 @@ session_dir: "~/.prompt-optimizer/sessions/session_1705632000000/"
 | Session 目录创建失败 | 输出错误信息，终止流程 |
 | session.json 读写失败 | 输出错误信息，终止流程 |
 
----
 
-## 向后兼容
-
-WebView 应用支持 v1-v3 格式的自动迁移：
-
-| 输入版本 | 处理方式 |
-|---------|---------|
-| v1-v3 | 自动迁移到 v4 格式 |
-| v4 | 直接使用 |
-
-迁移时自动填充的字段：
-- `sessionId`: 从文件路径推断或生成新 ID
-- `createdAt`/`updatedAt`: 使用当前时间
-- `projectPath`: 使用当前工作目录
-- `lang`: 根据 originalPrompt 内容检测
-- `mode`: 默认 "basic"
-- `status`: 默认 "active"

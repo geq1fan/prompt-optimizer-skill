@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -17,14 +18,13 @@ var assets embed.FS
 
 func main() {
 	// CLI 参数解析
-	inputFile := flag.String("input", "", "Input JSON file path (required)")
-	outputFile := flag.String("output", "", "Output JSON file path (required)")
+	sessionID := flag.String("session-id", "", "Session ID (required)")
 	timeout := flag.Int("timeout", 600, "Timeout in seconds (default: 600)")
 	flag.Parse()
 
 	// 检查是否为 Wails 绑定生成模式 (无参数运行)
 	// Wails 构建时会先运行程序来生成绑定，此时不传入参数
-	isBindingMode := *inputFile == "" && *outputFile == ""
+	isBindingMode := *sessionID == ""
 
 	var app *App
 	var err error
@@ -36,8 +36,19 @@ func main() {
 			resultChan: make(chan Result, 1),
 		}
 	} else {
-		// 正常模式：验证参数并加载数据
-		app, err = NewApp(*inputFile, *outputFile, *timeout)
+		// 正常模式：基于 session-id 推断路径
+		baseDir := filepath.Join(".", ".claude", "prompt-optimizer", "sessions", *sessionID)
+
+		// 自动创建目录
+		if err := os.MkdirAll(baseDir, 0755); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: failed to create session directory: %v\n", err)
+			os.Exit(1)
+		}
+
+		inputFile := filepath.Join(baseDir, "session.json")
+		outputFile := filepath.Join(baseDir, "result.json")
+
+		app, err = NewApp(inputFile, outputFile, *timeout)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)

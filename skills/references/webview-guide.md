@@ -44,28 +44,30 @@ WEBVIEW_BIN="$SKILL_DIR/bin/prompt-optimizer-webview"
 
 ### 2. 准备 Session 目录
 
+Session 目录由 WebView 自动创建，无需手动创建：
+
 ```bash
 # Session ID 格式简化为时间戳
 session_id="session_{timestamp}"
 
-# 使用 Session 目录存储文件
-SESSION_DIR=~/.prompt-optimizer/sessions/{session_id}
+# Session 目录路径（相对于项目根目录）
+SESSION_DIR=.claude/prompt-optimizer/sessions/{session_id}
 SESSION_FILE="$SESSION_DIR/session.json"
 OUTPUT_FILE="$SESSION_DIR/result.json"
-
-# 确保目录存在
-mkdir -p "$SESSION_DIR"
 
 # Agent 创建 session.json (见下文格式)
 ```
 
 ### 3. 调用 WebView
 
-WebView 直接读取 `session.json`，无需构造单独的 input.json：
+使用 `--session-id` 参数调用 WebView，目录和路径自动推断：
 
 ```bash
-"$WEBVIEW_BIN" --input "$SESSION_FILE" --output "$OUTPUT_FILE" --timeout 600
+"$WEBVIEW_BIN" --session-id "$session_id"
 ```
+
+可选参数：
+- `--timeout 600` - 超时秒数（默认 600）
 
 ### 4. 读取结果
 
@@ -390,32 +392,12 @@ if [ ! -f "$WEBVIEW_BIN" ]; then
 fi
 ```
 
-### 输入文件格式错误
-
-WebView 应用会返回错误信息：
-
-```json
-{
-  "action": "error",
-  "error": "Invalid input format: missing required field 'current'"
-}
-```
-
-### 超时处理
-
-默认超时 600 秒 (10 分钟)。可通过参数调整：
-
-```bash
-# 设置 5 分钟超时
---timeout 300
-```
-
 ### 进程异常退出
 
 检查退出码：
 
 ```bash
-"$WEBVIEW_BIN" --input "$SESSION_FILE" --output "$OUTPUT_FILE"
+"$WEBVIEW_BIN" --session-id "$session_id"
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
@@ -430,9 +412,13 @@ fi
 
 | 参数 | 类型 | 必填 | 默认值 | 说明 |
 |-----|------|------|-------|------|
-| `--input` | path | 是 | - | 输入 JSON 文件路径（session.json） |
-| `--output` | path | 是 | - | 输出 JSON 文件路径（result.json） |
+| `--session-id` | string | 是 | - | Session ID，用于推断文件路径 |
 | `--timeout` | number | 否 | 600 | 超时秒数 |
+
+**路径推断规则**：
+- 输入文件：`.claude/prompt-optimizer/sessions/{session-id}/session.json`
+- 输出文件：`.claude/prompt-optimizer/sessions/{session-id}/result.json`
+- 目录不存在时自动创建
 
 ---
 
@@ -441,11 +427,13 @@ fi
 ### 目录结构
 
 ```
-~/.prompt-optimizer/
-└── sessions/                           # Session 数据目录
-    └── session_1705632000000/          # 每个 session 一个目录
-        ├── session.json                # 核心状态文件（唯一真相源）
-        └── result.json                 # WebView 输出（临时文件）
+{project-root}/
+└── .claude/
+    └── prompt-optimizer/
+        └── sessions/                       # Session 数据目录
+            └── session_1705632000000/      # 每个 session 一个目录
+                ├── session.json            # 核心状态文件（唯一真相源）
+                └── result.json             # WebView 输出（临时文件）
 ```
 
 ### Session ID 格式
@@ -474,7 +462,7 @@ session_id="session_$(date +%s%3N)"
 
 ```bash
 # 删除 30 天未更新的 Session
-find ~/.prompt-optimizer/sessions -type d -mtime +30 -exec rm -rf {} \;
+find .claude/prompt-optimizer/sessions -type d -mtime +30 -exec rm -rf {} \;
 ```
 
 ---

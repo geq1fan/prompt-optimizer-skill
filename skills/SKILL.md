@@ -35,7 +35,7 @@ description: |
 
 每次 `/optimize-prompt` 调用都会创建新 Session：
 - 生成 `session_id`：`session_{timestamp}`（毫秒时间戳）
-- 创建目录：`~/.prompt-optimizer/sessions/{session_id}/`
+- Session 目录：`.claude/prompt-optimizer/sessions/{session_id}/`（由 WebView 自动创建）
 - 创建 `session.json`（v4 格式，唯一数据源）
 
 ### 2. 模式选择
